@@ -5,6 +5,8 @@ export function createCamera(gameWindow) {
   const MIDDLE_MOUSE_BUTTON = 1;
   const RIGHT_MOUSE_BUTTON = 2;
 
+  const MIN_CAMERA_RADIUS = 2;
+  const MAX_CAMERA_RADIUS = 10;
   const camera = new THREE.PerspectiveCamera(
     75,
     gameWindow.offsetWidth / gameWindow.offsetHeight,
@@ -54,12 +56,13 @@ export function createCamera(gameWindow) {
   }
 
   function onMouseMove(event) {
-    console.log("mousemove");
+    const deltaX = event.clientX - prevMouseX;
+    const deltaY = event.clientY - prevMouseY;
 
     // 카메라 회전
     if (isLeftMouseDown) {
-      cameraAzimuth += -((event.clientX - prevMouseX) * 0.5);
-      cameraElevation += (event.clientY - prevMouseY) * 0.5;
+      cameraAzimuth += -(deltaX * 0.5);
+      cameraElevation += deltaY * 0.5;
       cameraElevation = Math.min(180, Math.max(0, cameraElevation));
       updateCameraPosition();
     }
@@ -70,6 +73,12 @@ export function createCamera(gameWindow) {
 
     // 카메라 확대/축소
     if (isRightMouseDown) {
+      cameraRadius += deltaY * 0.02;
+      cameraRadius = Math.min(
+        MAX_CAMERA_RADIUS,
+        Math.max(MIN_CAMERA_RADIUS, cameraRadius)
+      );
+      updateCameraPosition();
     }
     prevMouseX = event.clientX;
     prevMouseY = event.clientY;

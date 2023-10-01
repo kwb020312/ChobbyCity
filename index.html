@@ -30,6 +30,9 @@
         document.addEventListener("mousedown", window.scene.onMouseDown, false);
         document.addEventListener("mouseup", window.scene.onMouseUp, false);
         document.addEventListener("mousemove", window.scene.onMouseMove, false);
+        document.addEventListener("contextmenu", (event) =>
+          event.preventDefault()
+        );
         window.scene.start();
       };
     </script>
