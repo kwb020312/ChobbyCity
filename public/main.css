@@ -1,3 +1,6 @@
+@import url('//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css');
+* { font-family: 'Spoqa Han Sans', 'Spoqa Han Sans JP', 'Sans-serif'; }
+
 html,
 body {
   height: 100%;
@@ -10,4 +13,31 @@ body {
 
 #render-target {
   height: 100%;
+}
+
+#ui-toolbar {
+  position: absolute;
+  width: 150px;
+  height: 100vh;
+  padding: 16px;
+  background-color: #00000033;
+}
+
+.ui-button {
+  background-color: #00000055;
+  border: 1px solid black;
+  color: lightgray;
+  height: 40px;
+  width: 100%;
+  font-size: 16px;
+  margin: 4px 0;
+  cursor: pointer;
+}
+
+.ui-button.selected {
+  background-color: #55558855;
+}
+
+.ui-button:not(.selected):hover {
+  background-color: #33333355;
 }
