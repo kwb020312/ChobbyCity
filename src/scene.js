@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { createCamera } from "./camera.js";
+import { createAssetInstance } from "./assets.js";
 
 export function createScene() {
   // Scene 초기설정
@@ -19,20 +20,15 @@ export function createScene() {
     scene.clear();
     terrain = [];
     buildings = [];
+
+    // grass geometry
     for (let x = 0; x < city.size; x++) {
       const column = [];
       for (let y = 0; y < city.size; y++) {
-        // 1. 각 좌표에 해당하는 메시/3D 객체를 불러온다.
-        // 2. scene에 mesh를 추가한다.
-        // grass geometry
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshLambertMaterial({ color: 0x00aa00 });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(x, -0.5, y);
+        const mesh = createAssetInstance("grass", x, y);
         scene.add(mesh);
         column.push(mesh);
       }
-
       terrain.push(column);
       buildings.push([...Array(city.size)]);
     }
@@ -47,23 +43,12 @@ export function createScene() {
         const tile = city.data[x][y];
 
         if (tile.building && tile.building.startsWith("building")) {
-          const height = Number(tile.building.slice(-1));
-          const buildingGeometry = new THREE.BoxGeometry(1, height, 1);
-          const buildingMaterial = new THREE.MeshLambertMaterial({
-            color: 0x777777,
-          });
-          const buildingMesh = new THREE.Mesh(
-            buildingGeometry,
-            buildingMaterial
-          );
-          buildingMesh.position.set(x, height / 2, y);
-
+          const mesh = createAssetInstance(tile.building, x, y);
           if (buildings[x][y]) {
             scene.remove(buildings[x][y]);
           }
-
-          scene.add(buildingMesh);
-          buildings[x][y] = buildingMesh;
+          scene.add(mesh);
+          buildings[x][y] = mesh;
         }
       }
     }
