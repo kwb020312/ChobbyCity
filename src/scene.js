@@ -22,12 +22,30 @@ export function createScene() {
       for (let y = 0; y < city.size; y++) {
         // 1. 각 좌표에 해당하는 메시/3D 객체를 불러온다.
         // 2. scene에 mesh를 추가한다.
+        // grass geometry
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshLambertMaterial({ color: 0x00aa00 });
         const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(x, 0, y);
+        mesh.position.set(x, -0.5, y);
         scene.add(mesh);
         column.push(mesh);
+
+        // building geometry
+        const tile = city.data[x][y];
+
+        if (tile.building === "building") {
+          const buildingGeometry = new THREE.BoxGeometry(1, 1, 1);
+          const buildingMaterial = new THREE.MeshLambertMaterial({
+            color: 0x777777,
+          });
+          const buildingMesh = new THREE.Mesh(
+            buildingGeometry,
+            buildingMaterial
+          );
+          buildingMesh.position.set(x, 0.5, y);
+          scene.add(buildingMesh);
+          column.push(buildingMesh);
+        }
       }
 
       meshes.push(column);
