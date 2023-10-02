@@ -93,14 +93,16 @@ export function createScene() {
     camera.onMouseDown(event);
 
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1
-    mouse.y = -(event.clienty / renderer.domElement.clientHeight) * 2 + 1
+    mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1
 
     raycaster.setFromCamera(mouse, camera.camera)
 
     let intersections = raycaster.intersectObjects(scene.children, false)
-
     if(intersections.length > 0) {
       console.log(intersections[0])
+      if(selectedObject) selectedObject.material.emissive.setHex(0)
+      selectedObject = intersections[0].object;
+      selectedObject.material.emissive.setHex(0x555555)
     }
   }
 
