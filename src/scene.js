@@ -19,6 +19,8 @@ export function createScene() {
   let terrain = [];
   let buildings = [];
 
+  let onObjectSelected = undefined
+
   function initialize(city) {
     scene.clear();
     terrain = [];
@@ -102,6 +104,10 @@ export function createScene() {
       if(selectedObject) selectedObject.material.emissive.setHex(0)
       selectedObject = intersections[0].object;
       selectedObject.material.emissive.setHex(0x555555)
+
+      if(this.onObjectSelected) {
+        this.onObjectSelected(selectedObject)
+      }
     }
   }
 
@@ -114,6 +120,7 @@ export function createScene() {
   }
 
   return {
+    onObjectSelected,
     initialize,
     update,
     start,
