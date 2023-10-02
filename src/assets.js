@@ -9,6 +9,7 @@ const assets = {
     // grass geometry
     const material = new THREE.MeshLambertMaterial({ color: 0x00aa00 });
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.userData = { id: "grass" };
     mesh.position.set(x, -0.5, y);
 
     return mesh;
@@ -18,6 +19,7 @@ const assets = {
       color: 0x777777,
     });
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.userData = { id: "building-1" };
     mesh.position.set(x, 0.5, y);
 
     return mesh;
@@ -27,6 +29,7 @@ const assets = {
       color: 0x777777,
     });
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.userData = { id: "building-2" };
     mesh.scale.set(1, 2, 1);
     mesh.position.set(x, 1, y);
 
@@ -37,6 +40,7 @@ const assets = {
       color: 0x777777,
     });
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.userData = { id: "building-3" };
     mesh.scale.set(1, 3, 1);
     mesh.position.set(x, 1.5, y);
 

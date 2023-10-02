@@ -39,16 +39,20 @@ export function createScene() {
   function update(city) {
     for (let x = 0; x < city.size; x++) {
       for (let y = 0; y < city.size; y++) {
-        // building geometry
-        const tile = city.data[x][y];
+        const currentBuildingId = buildings[x][y]?.userData.id;
+        const newBuildingId = city.data[x][y].buildingId;
 
-        if (tile.building && tile.building.startsWith("building")) {
-          const mesh = createAssetInstance(tile.building, x, y);
-          if (buildings[x][y]) {
-            scene.remove(buildings[x][y]);
-          }
-          scene.add(mesh);
-          buildings[x][y] = mesh;
+        // 플레이어가 건물을 지웠을 경우, scene 적용
+        if (!newBuildingId && currentBuildingId) {
+          scene.remove(buildings[x][y]);
+          buildings[x][y] = undefined;
+        }
+
+        // 데이터 모델이 변경된 경우, scene update
+        if (newBuildingId !== currentBuildingId) {
+          scene.remove(buildings[x][y]);
+          buildings[x][y] = createAssetInstance(newBuildingId, x, y);
+          scene.add(buildings[x][y]);
         }
       }
     }
