@@ -13,13 +13,13 @@ export function createScene() {
   renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
   gameWindow.appendChild(renderer.domElement);
 
-  const raycaster = new THREE.Raycaster()
-  const mouse = new THREE.Vector2()
-  let selectedObject = undefined
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  let selectedObject = undefined;
   let terrain = [];
   let buildings = [];
 
-  let onObjectSelected = undefined
+  let onObjectSelected = undefined;
 
   function initialize(city) {
     scene.clear();
@@ -55,7 +55,7 @@ export function createScene() {
         }
 
         // 데이터 모델이 변경된 경우, scene update
-        if (newBuildingId !== currentBuildingId) {
+        if (newBuildingId && newBuildingId !== currentBuildingId) {
           scene.remove(buildings[x][y]);
           buildings[x][y] = createAssetInstance(newBuildingId, x, y);
           scene.add(buildings[x][y]);
@@ -94,19 +94,19 @@ export function createScene() {
   function onMouseDown(event) {
     camera.onMouseDown(event);
 
-    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1
-    mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1
+    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
 
-    raycaster.setFromCamera(mouse, camera.camera)
+    raycaster.setFromCamera(mouse, camera.camera);
 
-    let intersections = raycaster.intersectObjects(scene.children, false)
-    if(intersections.length > 0) {
-      if(selectedObject) selectedObject.material.emissive.setHex(0)
+    let intersections = raycaster.intersectObjects(scene.children, false);
+    if (intersections.length > 0) {
+      if (selectedObject) selectedObject.material.emissive.setHex(0);
       selectedObject = intersections[0].object;
-      selectedObject.material.emissive.setHex(0x555555)
+      selectedObject.material.emissive.setHex(0x555555);
 
-      if(this.onObjectSelected) {
-        this.onObjectSelected(selectedObject)
+      if (this.onObjectSelected) {
+        this.onObjectSelected(selectedObject);
       }
     }
   }
