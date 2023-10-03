@@ -1,6 +1,6 @@
 import { createScene } from "./scene.js";
 import { createCity } from "./city.js";
-import buildingFactory from "./buildings.js";
+import buildingFactory, { createBuilding } from "./buildings.js";
 
 export function createGame() {
   let activeToolId = "";
@@ -40,6 +40,34 @@ export function createGame() {
   setInterval(() => {
     game.update();
   }, 1000);
+
+  function useActiveTool(object) {
+    if (!object) {
+      updateInfoPanel(null);
+      return;
+    }
+
+    const { x, y } = object.userData;
+    const tile = city.tiles[x][y];
+
+    if (activeToolId === "select") {
+      scene.setActiveObject(object);
+      updateInfoPanel(tile);
+    } else if (activeToolId === "bulldoze") {
+      this.removeBuilding();
+      scene.update(city);
+    } else if (!tile.building) {
+      const buildingType = activeToolId;
+      tile.placeBuilding(buildingType);
+      scene.update(city);
+    }
+  }
+
+  function updateInfoPanel(tile) {
+    document.getElementById("selected-object-info").innerHTML = tile
+      ? JSON.stringify(tile, " ", 2)
+      : "";
+  }
 
   scene.start();
 
