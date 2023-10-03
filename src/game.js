@@ -1,5 +1,6 @@
 import { createScene } from "./scene.js";
 import { createCity } from "./city.js";
+import buildingFactory from "./buildings.js";
 
 export function createGame() {
   let activeToolId = "";
@@ -14,10 +15,10 @@ export function createGame() {
 
     if (activeToolId === "bulldoze") {
       // 건물 삭제
-      tile.buildingId = undefined;
-    } else if (!tile.buildingId) {
+      tile.building = undefined;
+    } else if (!tile.building) {
       // 건물 생성
-      tile.buildingId = activeToolId;
+      tile.building = buildingFactory[activeToolId]();
     }
     scene.update(city);
   };
@@ -33,7 +34,6 @@ export function createGame() {
     },
     setActiveToolId(toolId) {
       activeToolId = toolId;
-      console.log(activeToolId);
     },
   };
 

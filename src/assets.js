@@ -14,33 +14,36 @@ const assets = {
 
     return mesh;
   },
-  residential: (x, y) => {
+  residential: (x, y, data) => {
     const material = new THREE.MeshLambertMaterial({
       color: 0x00ff00,
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.userData = { id: "residentail", x, y };
-    mesh.position.set(x, 0.5, y);
+    mesh.scale.set(1, data.height, 1);
+    mesh.position.set(x, data.height / 2, y);
 
     return mesh;
   },
-  commercial: (x, y) => {
+  commercial: (x, y, data) => {
     const material = new THREE.MeshLambertMaterial({
       color: 0x0000ff,
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.userData = { id: "commercial", x, y };
-    mesh.position.set(x, 0.5, y);
+    mesh.scale.set(1, data.height, 1);
+    mesh.position.set(x, data.height / 2, y);
 
     return mesh;
   },
-  industrial: (x, y) => {
+  industrial: (x, y, data) => {
     const material = new THREE.MeshLambertMaterial({
       color: 0xffff00,
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.userData = { id: "industrial", x, y };
-    mesh.position.set(x, 0.5, y);
+    mesh.scale.set(1, data.height, 1);
+    mesh.position.set(x, data.height / 2, y);
 
     return mesh;
   },
@@ -57,9 +60,9 @@ const assets = {
   },
 };
 
-export function createAssetInstance(assetId, x, y) {
+export function createAssetInstance(assetId, x, y, data) {
   if (assetId in assets) {
-    return assets[assetId](x, y);
+    return assets[assetId](x, y, data);
   } else {
     console.warn(`Asset Id ${assetId} is undefined`);
     return undefined;
