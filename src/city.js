@@ -17,7 +17,6 @@ export function createCity(size) {
   }
 
   function update() {
-    console.log(`Updating`);
     for (let x = 0; x < size; x++) {
       const column = [];
       for (let y = 0; y < size; y++) {
