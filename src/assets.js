@@ -43,59 +43,30 @@ export function createAssetInstance(type, x, y, data) {
 }
 
 const assets = {
-  grass: (x, y) => {
+  ground: (x, y) => {
     // 1. 각 좌표에 해당하는 메시/3D 객체를 불러온다.
     // 2. scene에 mesh를 추가한다.
     // grass geometry
-    const material = new THREE.MeshLambertMaterial({ color: 0x00aa00 });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.userData = { id: "grass", x, y };
+    const material = new THREE.MeshLambertMaterial({ color: textures.grass });
+    const mesh = new THREE.Mesh(cube, material);
+    mesh.userData = { x, y };
     mesh.position.set(x, -0.5, y);
+    mesh.receiveShadow = true;
 
     return mesh;
   },
-  residential: (x, y, data) => {
-    const material = new THREE.MeshLambertMaterial({
-      color: 0x00ff00,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.userData = { id: "residentail", x, y };
-    mesh.scale.set(1, data.height, 1);
-    mesh.position.set(x, data.height / 2, y);
-
-    return mesh;
-  },
-  commercial: (x, y, data) => {
-    const material = new THREE.MeshLambertMaterial({
-      color: 0x0000ff,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.userData = { id: "commercial", x, y };
-    mesh.scale.set(1, data.height, 1);
-    mesh.position.set(x, data.height / 2, y);
-
-    return mesh;
-  },
-  industrial: (x, y, data) => {
-    const material = new THREE.MeshLambertMaterial({
-      color: 0xffff00,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.userData = { id: "industrial", x, y };
-    mesh.scale.set(1, data.height, 1);
-    mesh.position.set(x, data.height / 2, y);
-
-    return mesh;
-  },
+  residential: (x, y, data) => createZoneMesh(x, y, data),
+  commercial: (x, y, data) => createZoneMesh(x, y, data),
+  industrial: (x, y, data) => createZoneMesh(x, y, data),
   road: (x, y) => {
     const material = new THREE.MeshLambertMaterial({
-      color: 0x444440,
+      color: 0x222222,
     });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.userData = { id: "road", x, y };
-    mesh.scale.set(1, 0.1, 1);
-    mesh.position.set(x, 0.05, y);
-
+    const mesh = new THREE.Mesh(cube, material);
+    mesh.userData = { x, y };
+    mesh.scale.set(1, 0.02, 1);
+    mesh.position.set(x, 0.01, y);
+    mesh.receiveShadow = true;
     return mesh;
   },
 };
