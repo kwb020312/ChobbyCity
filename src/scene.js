@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import { createCameraManager } from "./camera.js";
+import { createCameraManager } from "./cameraManager.js";
 import { createAssetInstance } from "./assets.js";
 
 export function createScene() {
-  // Scene 초기설정
+  // Initial scene setup
   const gameWindow = document.getElementById("render-target");
   const scene = new THREE.Scene();
 
@@ -16,65 +16,17 @@ export function createScene() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   gameWindow.appendChild(renderer.domElement);
 
-  // 오브젝트 선택 관련
+  // Variables for object selection
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
-  // 최근 선택된 obj
+  // Last object the user has clicked on
   let activeObject = undefined;
-
-  // 최근 마우스오버 된 obj
+  // Object the mouse is currently hovering over
   let hoverObject = undefined;
 
-  // tile위치 정보가 저장된 1차원 배열
+  // 2D array of building meshes at each tile location
   let buildings = [];
-
-  function initialize(city) {
-    scene.clear();
-    buildings = [];
-
-    // grass geometry
-    for (let x = 0; x < city.size; x++) {
-      const column = [];
-      for (let y = 0; y < city.size; y++) {
-        const mesh = createAssetInstance(city.data[x][y].terrainId, x, y);
-        scene.add(mesh);
-        column.push(mesh);
-      }
-      // terrain.push(column);
-      buildings.push([...Array(city.size)]);
-    }
-
-    setupLights();
-  }
-
-  function update(city) {
-    for (let x = 0; x < city.size; x++) {
-      for (let y = 0; y < city.size; y++) {
-        const tile = city.data[x][y];
-        const existingBuildingMesh = buildings[x][y];
-
-        // 플레이어가 건물을 지웠을 경우, scene 적용
-        if (!tile.building && existingBuildingMesh) {
-          scene.remove(existingBuildingMesh);
-          buildings[x][y] = undefined;
-        }
-
-        // 데이터 모델이 변경된 경우, scene update
-        if (tile.building && tile.building.updated) {
-          scene.remove(existingBuildingMesh);
-          buildings[x][y] = createAssetInstance(
-            tile.building.type,
-            x,
-            y,
-            tile.building
-          );
-          scene.add(buildings[x][y]);
-          tile.building.updated = false;
-        }
-      }
-    }
-  }
 
   function setupLights() {
     const sun = new THREE.DirectionalLight(0xffffff, 1);
@@ -92,54 +44,162 @@ export function createScene() {
     scene.add(new THREE.AmbientLight(0xffffff, 0.3));
   }
 
+  /**
+   * Render the contents of the scene
+   */
   function draw() {
     renderer.render(scene, cameraManager.camera);
   }
 
-  function start() {
-    renderer.setAnimationLoop(draw);
-  }
-
-  function stop() {
-    renderer.setAnimationLoop(null);
-  }
-
-  function onMouseDown(event) {
-    cameraManager.onMouseDown(event);
-
-    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
-    mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, cameraManager.camera);
-
-    let intersections = raycaster.intersectObjects(scene.children, false);
-    if (intersections.length > 0) {
-      if (activeObject) activeObject.material.emissive.setHex(0);
-      activeObject = intersections[0].object;
-      activeObject.material.emissive.setHex(0x555555);
-
-      if (this.onObjectSelected) {
-        this.onObjectSelected(activeObject);
-      }
+  /**
+   * Updates the material properties of the object to have the
+   * specified emission color
+   * @param {THREE.Mesh} object
+   * @param {number} color
+   * @returns
+   */
+  function setObjectEmission(object, color) {
+    if (!object) return;
+    if (Array.isArray(object.material)) {
+      object.material.forEach((material) => material.emissive?.setHex(color));
+    } else {
+      object.material.emissive?.setHex(color);
     }
   }
 
-  function onMouseUp(event) {
-    cameraManager.onMouseUp(event);
-  }
-
-  function onMouseMove(event) {
-    cameraManager.onMouseMove(event);
-  }
-
   return {
-    activeObject,
-    initialize,
-    update,
-    start,
-    stop,
-    onMouseDown,
-    onMouseUp,
-    onMouseMove,
+    /* PROPERTIES */
+
+    cameraManager,
+
+    /* METHODS */
+
+    /**
+     * Initializes the scene with the passed data model
+     * @param {object} city City data model
+     */
+    initialize(city) {
+      scene.clear();
+      buildings = [];
+
+      for (let x = 0; x < city.size; x++) {
+        const column = [];
+        for (let y = 0; y < city.size; y++) {
+          const mesh = createAssetInstance(city.tiles[x][y].terrainId, x, y);
+          scene.add(mesh);
+          column.push(mesh);
+        }
+        buildings.push([...Array(city.size)]);
+      }
+
+      setupLights();
+    },
+
+    /**
+     * Updates the state of the city, moving it forward by
+     * one simulation step
+     */
+    update(city) {
+      for (let x = 0; x < city.size; x++) {
+        for (let y = 0; y < city.size; y++) {
+          const tile = city.tiles[x][y];
+          const existingBuildingMesh = buildings[x][y];
+
+          // If the player removes a building, remove it from the scene
+          if (!tile.building && existingBuildingMesh) {
+            scene.remove(existingBuildingMesh);
+            buildings[x][y] = undefined;
+          }
+
+          // If the data model has changed, update the mesh
+          if (tile.building && tile.building.updated) {
+            scene.remove(existingBuildingMesh);
+            buildings[x][y] = createAssetInstance(
+              tile.building.type,
+              x,
+              y,
+              tile.building
+            );
+            scene.add(buildings[x][y]);
+            tile.building.updated = false;
+          }
+        }
+      }
+    },
+
+    /**
+     * Starts the renderer
+     */
+    start() {
+      renderer.setAnimationLoop(draw);
+    },
+
+    /**
+     * Stops the renderer
+     */
+    stop() {
+      renderer.setAnimationLoop(null);
+    },
+
+    /**
+     * Sets the object that is currently highlighted
+     * @param {THREE.Mesh} object
+     */
+    setHighlightedObject(object) {
+      // Unhighlight the previously hovered object (if it isn't currently selected)
+      if (hoverObject && hoverObject !== activeObject) {
+        setObjectEmission(hoverObject, 0x000000);
+      }
+
+      hoverObject = object;
+
+      if (hoverObject) {
+        // Highlight the new hovered object (if it isn't currently selected))
+        setObjectEmission(hoverObject, 0x555555);
+      }
+    },
+
+    /**
+     * Gets the object currently under the mouse cursor. If there is nothing under
+     * the mouse cursor, returns null
+     * @param {MouseEvent} event Mouse event
+     */
+    getSelectedObject(event) {
+      // Compute normalized mouse coordinates
+      mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+      mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, cameraManager.camera);
+
+      let intersections = raycaster.intersectObjects(scene.children, false);
+
+      if (intersections.length > 0) {
+        return intersections[0].object;
+      } else {
+        return null;
+      }
+    },
+
+    /**
+     * Sets the currently selected object and highlights it
+     * @param {object} object
+     */
+    setActiveObject(object) {
+      // Clear highlight on previously active object
+      setObjectEmission(activeObject, 0x000000);
+      activeObject = object;
+      // Highlight new active object
+      setObjectEmission(activeObject, 0xaaaa55);
+    },
+
+    /**
+     * Resizes the renderer to fit the current game window
+     */
+    onResize() {
+      cameraManager.camera.aspect =
+        gameWindow.offsetWidth / gameWindow.offsetHeight;
+      cameraManager.camera.updateProjectionMatrix();
+      renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
+    },
   };
 }

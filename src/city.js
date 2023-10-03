@@ -1,34 +1,41 @@
-import { createTile } from "./tile";
+import { createTile } from "./tile.js";
 
+/**
+ * Creates a new City object
+ * @param {number} size The size of the city (# of tiles wide)
+ * @returns a City object
+ */
 export function createCity(size) {
-  const data = [];
+  const tiles = [];
+  const citizens = [];
 
-  initialize();
-
-  //   N * N 의 데이터 생성
-  function initialize() {
-    for (let x = 0; x < size; x++) {
-      const column = [];
-      for (let y = 0; y < size; y++) {
-        const tile = createTile(x, y);
-
-        column.push(tile);
-      }
-      data.push(column);
+  for (let x = 0; x < size; x++) {
+    const column = [];
+    for (let y = 0; y < size; y++) {
+      const tile = createTile(x, y);
+      column.push(tile);
     }
-  }
-
-  function update() {
-    for (let x = 0; x < size; x++) {
-      for (let y = 0; y < size; y++) {
-        data[x][y].building?.update();
-      }
-    }
+    tiles.push(column);
   }
 
   return {
+    /* PROPERTIES */
+
     size,
-    data,
-    update,
+    tiles,
+    citizens,
+
+    /* METHODS */
+
+    /**
+     * Update the state of each tile in the city
+     */
+    update() {
+      for (let x = 0; x < size; x++) {
+        for (let y = 0; y < size; y++) {
+          tiles[x][y].building?.update(this);
+        }
+      }
+    },
   };
 }

@@ -9,20 +9,23 @@ function loadTexture(url) {
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
   tex.repeat.set(1, 1);
+  tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
 
+/* Texture library */
+// Credit: https://opengameart.org/content/free-urban-textures-buildings-apartments-shop-fronts
 const textures = {
-  grass: loadTexture("/public/textures/grass.png"),
-  residential1: loadTexture("/public/textures/residential1.png"),
-  residential2: loadTexture("/public/textures/residential2.png"),
-  residential3: loadTexture("/public/textures/residential3.png"),
-  commercial1: loadTexture("/public/textures/commercial1.png"),
-  commercial2: loadTexture("/public/textures/commercial2.png"),
-  commercial3: loadTexture("/public/textures/commercial3.png"),
-  industrial1: loadTexture("/public/textures/industrial1.png"),
-  industrial2: loadTexture("/public/textures/industrial2.png"),
-  industrial3: loadTexture("/public/textures/industrial3.png"),
+  grass: loadTexture("public/textures/grass.png"),
+  residential1: loadTexture("public/textures/residential1.png"),
+  residential2: loadTexture("public/textures/residential2.png"),
+  residential3: loadTexture("public/textures/residential3.png"),
+  commercial1: loadTexture("public/textures/commercial1.png"),
+  commercial2: loadTexture("public/textures/commercial2.png"),
+  commercial3: loadTexture("public/textures/commercial3.png"),
+  industrial1: loadTexture("public/textures/industrial1.png"),
+  industrial2: loadTexture("public/textures/industrial2.png"),
+  industrial3: loadTexture("public/textures/industrial3.png"),
 };
 
 function getTopMaterial() {
@@ -33,35 +36,39 @@ function getSideMaterial(textureName) {
   return new THREE.MeshLambertMaterial({ map: textures[textureName].clone() });
 }
 
+/**
+ * Creates a new 3D asset
+ * @param {string} type The type of the asset to create
+ * @param {number} x The x-coordinate of the asset
+ * @param {number} y The y-coordinate of the asset
+ * @param {object} data Additional metadata needed for creating the asset
+ * @returns
+ */
 export function createAssetInstance(type, x, y, data) {
+  // If asset exists, configure it and return it
   if (type in assets) {
     return assets[type](x, y, data);
   } else {
-    console.warn(`Asset Id ${type} is undefined`);
+    console.warn(`Asset Type ${type} is not found.`);
     return undefined;
   }
 }
 
+// Asset library
 const assets = {
   ground: (x, y) => {
-    // 1. 각 좌표에 해당하는 메시/3D 객체를 불러온다.
-    // 2. scene에 mesh를 추가한다.
-    // grass geometry
-    const material = new THREE.MeshLambertMaterial({ color: textures.grass });
+    const material = new THREE.MeshLambertMaterial({ map: textures.grass });
     const mesh = new THREE.Mesh(cube, material);
     mesh.userData = { x, y };
     mesh.position.set(x, -0.5, y);
     mesh.receiveShadow = true;
-
     return mesh;
   },
   residential: (x, y, data) => createZoneMesh(x, y, data),
   commercial: (x, y, data) => createZoneMesh(x, y, data),
   industrial: (x, y, data) => createZoneMesh(x, y, data),
   road: (x, y) => {
-    const material = new THREE.MeshLambertMaterial({
-      color: 0x222222,
-    });
+    const material = new THREE.MeshLambertMaterial({ color: 0x222222 });
     const mesh = new THREE.Mesh(cube, material);
     mesh.userData = { x, y };
     mesh.scale.set(1, 0.02, 1);
@@ -77,12 +84,12 @@ function createZoneMesh(x, y, data) {
   const topMaterial = getTopMaterial();
   const sideMaterial = getSideMaterial(textureName);
   let materialArray = [
-    sideMaterial,
-    sideMaterial,
-    topMaterial,
-    topMaterial,
-    sideMaterial,
-    sideMaterial,
+    sideMaterial, // +X
+    sideMaterial, // -X
+    topMaterial, // +Y
+    topMaterial, // -Y
+    sideMaterial, // +Z
+    sideMaterial, // -Z
   ];
   let mesh = new THREE.Mesh(cube, materialArray);
   mesh.userData = { x, y };

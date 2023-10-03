@@ -21,40 +21,66 @@
     <div id="root-window">
       <div id="render-target">
         <div id="ui-toolbar">
+          <div>
+            <button
+              id="button-select"
+              class="ui-button selected"
+              data-type="select"
+              onclick="window.game.onToolSelected(event)"
+            >
+              선택
+            </button>
+            <button
+              id="button-bulldoze"
+              class="ui-button"
+              onclick="window.game.onToolSelected(event)"
+              data-type="bulldoze"
+            >
+              제거
+            </button>
+            <button
+              id="button-residential"
+              class="ui-button"
+              onclick="window.game.onToolSelected(event)"
+              data-type="residential"
+            >
+              주택
+            </button>
+            <button
+              id="button-commercial"
+              class="ui-button"
+              onclick="window.game.onToolSelected(event)"
+              data-type="commercial"
+            >
+              시장
+            </button>
+            <button
+              id="button-industrial"
+              class="ui-button"
+              onclick="window.game.onToolSelected(event)"
+              data-type="industrial"
+            >
+              회사
+            </button>
+            <button
+              id="button-road"
+              class="ui-button"
+              onclick="window.game.onToolSelected(event)"
+              data-type="road"
+            >
+              도로
+            </button>
+          </div>
+          <div id="info-panel" class="ui-container">
+            <h1>정보</h1>
+            <div id="selected-object-info"></div>
+          </div>
           <button
-            id="button-bulldoze"
-            class="ui-button selected"
-            onclick="setActiveTool(event, 'bulldoze')"
-          >
-            제거
-          </button>
-          <button
-            id="button-residential"
+            id="button-pause"
             class="ui-button"
-            onclick="setActiveTool(event, 'residential')"
+            onclick="window.game.togglePause()"
           >
-            주택
-          </button>
-          <button
-            id="button-commercial"
-            class="ui-button"
-            onclick="setActiveTool(event, 'commercial')"
-          >
-            시장
-          </button>
-          <button
-            id="button-industrial"
-            class="ui-button"
-            onclick="setActiveTool(event, 'industrial')"
-          >
-            회사
-          </button>
-          <button
-            id="button-road"
-            class="ui-button"
-            onclick="setActiveTool(event, 'road')"
-          >
-            도로
+            PAUSE
           </button>
         </div>
       </div>
@@ -62,21 +88,6 @@
 
     <script type="module">
       import { createGame } from "./src/game.js";
-
-      let selectedControl = document.getElementById("button-bulldoze");
-      window.onload = () => {
-        window.game = createGame();
-      };
-
-      window.setActiveTool = (event, toolId) => {
-        if (selectedControl) {
-          selectedControl.classList.remove("selected");
-        }
-        selectedControl = event.target;
-        selectedControl.classList.add("selected");
-
-        window.game.setActiveToolId(toolId);
-      };
     </script>
   </body>
 </html>
