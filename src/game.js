@@ -14,9 +14,12 @@ export function createGame() {
 
     if (activeToolId === "bulldoze") {
       // 건물 삭제
+      tile.buildingId = undefined;
     } else if (!tile.buildingId) {
       // 건물 생성
+      tile.buildingId = activeToolId;
     }
+    scene.update(city);
   };
   document.addEventListener("mousedown", scene.onMouseDown.bind(scene), false);
   document.addEventListener("mouseup", scene.onMouseUp.bind(scene), false);
