@@ -1,6 +1,14 @@
 import * as THREE from "three";
 
 const geometry = new THREE.BoxGeometry(1, 1, 1);
+export function createAssetInstance(type, x, y, data) {
+  if (type in assets) {
+    return assets[type](x, y, data);
+  } else {
+    console.warn(`Asset Id ${type} is undefined`);
+    return undefined;
+  }
+}
 
 const assets = {
   grass: (x, y) => {
@@ -59,12 +67,3 @@ const assets = {
     return mesh;
   },
 };
-
-export function createAssetInstance(assetId, x, y, data) {
-  if (assetId in assets) {
-    return assets[assetId](x, y, data);
-  } else {
-    console.warn(`Asset Id ${assetId} is undefined`);
-    return undefined;
-  }
-}

@@ -1,41 +1,47 @@
 import * as THREE from "three";
-import { createCamera } from "./camera.js";
+import { createCameraManager } from "./camera.js";
 import { createAssetInstance } from "./assets.js";
 
 export function createScene() {
   // Scene 초기설정
   const gameWindow = document.getElementById("render-target");
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x777777);
 
-  const camera = createCamera(gameWindow);
+  const cameraManager = createCameraManager(gameWindow);
+
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
+  renderer.setClearColor(0x000000, 0);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   gameWindow.appendChild(renderer.domElement);
 
+  // 오브젝트 선택 관련
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  let selectedObject = undefined;
-  let terrain = [];
-  let buildings = [];
 
-  let onObjectSelected = undefined;
+  // 최근 선택된 obj
+  let activeObject = undefined;
+
+  // 최근 마우스오버 된 obj
+  let hoverObject = undefined;
+
+  // tile위치 정보가 저장된 1차원 배열
+  let buildings = [];
 
   function initialize(city) {
     scene.clear();
-    terrain = [];
     buildings = [];
 
     // grass geometry
     for (let x = 0; x < city.size; x++) {
       const column = [];
       for (let y = 0; y < city.size; y++) {
-        const terrainId = city.data[x][y].terrainId;
-        const mesh = createAssetInstance(terrainId, x, y);
+        const mesh = createAssetInstance(city.data[x][y].terrainId, x, y);
         scene.add(mesh);
         column.push(mesh);
       }
-      terrain.push(column);
+      // terrain.push(column);
       buildings.push([...Array(city.size)]);
     }
 
@@ -58,7 +64,7 @@ export function createScene() {
         if (tile.building && tile.building.updated) {
           scene.remove(existingBuildingMesh);
           buildings[x][y] = createAssetInstance(
-            tile.building.id,
+            tile.building.type,
             x,
             y,
             tile.building
@@ -71,22 +77,23 @@ export function createScene() {
   }
 
   function setupLights() {
-    const lights = [
-      new THREE.AmbientLight(0xffffff, 0.2),
-      new THREE.DirectionalLight(0xffffff, 0.3),
-      new THREE.DirectionalLight(0xffffff, 0.3),
-      new THREE.DirectionalLight(0xffffff, 0.3),
-    ];
-
-    lights[1].position.set(0, 1, 0);
-    lights[2].position.set(1, 1, 0);
-    lights[3].position.set(0, 1, 1);
-
-    scene.add(...lights);
+    const sun = new THREE.DirectionalLight(0xffffff, 1);
+    sun.position.set(20, 20, 20);
+    sun.castShadow = true;
+    sun.shadow.camera.left = -10;
+    sun.shadow.camera.right = 10;
+    sun.shadow.camera.top = 0;
+    sun.shadow.camera.bottom = -10;
+    sun.shadow.mapSize.width = 1024;
+    sun.shadow.mapSize.height = 1024;
+    sun.shadow.camera.near = 0.5;
+    sun.shadow.camera.far = 50;
+    scene.add(sun);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.3));
   }
 
   function draw() {
-    renderer.render(scene, camera.camera);
+    renderer.render(scene, cameraManager.camera);
   }
 
   function start() {
@@ -98,35 +105,35 @@ export function createScene() {
   }
 
   function onMouseDown(event) {
-    camera.onMouseDown(event);
+    cameraManager.onMouseDown(event);
 
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
     mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
 
-    raycaster.setFromCamera(mouse, camera.camera);
+    raycaster.setFromCamera(mouse, cameraManager.camera);
 
     let intersections = raycaster.intersectObjects(scene.children, false);
     if (intersections.length > 0) {
-      if (selectedObject) selectedObject.material.emissive.setHex(0);
-      selectedObject = intersections[0].object;
-      selectedObject.material.emissive.setHex(0x555555);
+      if (activeObject) activeObject.material.emissive.setHex(0);
+      activeObject = intersections[0].object;
+      activeObject.material.emissive.setHex(0x555555);
 
       if (this.onObjectSelected) {
-        this.onObjectSelected(selectedObject);
+        this.onObjectSelected(activeObject);
       }
     }
   }
 
   function onMouseUp(event) {
-    camera.onMouseUp(event);
+    cameraManager.onMouseUp(event);
   }
 
   function onMouseMove(event) {
-    camera.onMouseMove(event);
+    cameraManager.onMouseMove(event);
   }
 
   return {
-    onObjectSelected,
+    activeObject,
     initialize,
     update,
     start,
