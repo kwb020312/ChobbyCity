@@ -1,8 +1,8 @@
-import { createTile } from "./tile.js";
+import { createTile } from './tile.js';
 
 /**
  * Creates a new City object
- * @param {number} size The size of the city (# of tiles wide)
+ * @param {number} size The size of the city (# of tiles wide) 
  * @returns a City object
  */
 export function createCity(size) {
@@ -27,6 +27,10 @@ export function createCity(size) {
 
     /* METHODS */
 
+    getPopulation() {
+      return this.citizens.length;
+    },
+    
     /**
      * Update the state of each tile in the city
      */
@@ -36,6 +40,6 @@ export function createCity(size) {
           tiles[x][y].building?.update(this);
         }
       }
-    },
-  };
+    }
+  }
 }

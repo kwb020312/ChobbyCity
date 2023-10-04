@@ -1,12 +1,13 @@
-import * as THREE from "three";
-import { createCameraManager } from "./cameraManager.js";
-import { createAssetInstance } from "./assets.js";
+import * as THREE from 'three';
+import { createCameraManager } from './cameraManager.js';
+import { createAssetManager } from './assets.js';
 
 export function createScene() {
   // Initial scene setup
-  const gameWindow = document.getElementById("render-target");
+  const gameWindow = document.getElementById('render-target');
   const scene = new THREE.Scene();
 
+  const assetManager = createAssetManager();
   const cameraManager = createCameraManager(gameWindow);
 
   const renderer = new THREE.WebGLRenderer();
@@ -29,7 +30,7 @@ export function createScene() {
   let buildings = [];
 
   function setupLights() {
-    const sun = new THREE.DirectionalLight(0xffffff, 1);
+    const sun = new THREE.DirectionalLight(0xffffff, 1)
     sun.position.set(20, 20, 20);
     sun.castShadow = true;
     sun.shadow.camera.left = -10;
@@ -54,14 +55,14 @@ export function createScene() {
   /**
    * Updates the material properties of the object to have the
    * specified emission color
-   * @param {THREE.Mesh} object
-   * @param {number} color
-   * @returns
+   * @param {THREE.Mesh} object 
+   * @param {number} color 
+   * @returns 
    */
   function setObjectEmission(object, color) {
     if (!object) return;
     if (Array.isArray(object.material)) {
-      object.material.forEach((material) => material.emissive?.setHex(color));
+      object.material.forEach(material => material.emissive?.setHex(color));
     } else {
       object.material.emissive?.setHex(color);
     }
@@ -76,25 +77,25 @@ export function createScene() {
 
     /**
      * Initializes the scene with the passed data model
-     * @param {object} city City data model
+     * @param {object} city City data model 
      */
     initialize(city) {
       scene.clear();
       buildings = [];
-
+  
       for (let x = 0; x < city.size; x++) {
         const column = [];
         for (let y = 0; y < city.size; y++) {
-          const mesh = createAssetInstance(city.tiles[x][y].terrainId, x, y);
+          const mesh = assetManager.createMesh(city.tiles[x][y].terrainId, x, y);
           scene.add(mesh);
           column.push(mesh);
         }
         buildings.push([...Array(city.size)]);
       }
-
+  
       setupLights();
     },
-
+  
     /**
      * Updates the state of the city, moving it forward by
      * one simulation step
@@ -104,22 +105,17 @@ export function createScene() {
         for (let y = 0; y < city.size; y++) {
           const tile = city.tiles[x][y];
           const existingBuildingMesh = buildings[x][y];
-
+  
           // If the player removes a building, remove it from the scene
           if (!tile.building && existingBuildingMesh) {
             scene.remove(existingBuildingMesh);
             buildings[x][y] = undefined;
           }
-
+  
           // If the data model has changed, update the mesh
           if (tile.building && tile.building.updated) {
             scene.remove(existingBuildingMesh);
-            buildings[x][y] = createAssetInstance(
-              tile.building.type,
-              x,
-              y,
-              tile.building
-            );
+            buildings[x][y] = assetManager.createMesh(tile.building.type, x, y, tile.building);
             scene.add(buildings[x][y]);
             tile.building.updated = false;
           }
@@ -143,7 +139,7 @@ export function createScene() {
 
     /**
      * Sets the object that is currently highlighted
-     * @param {THREE.Mesh} object
+     * @param {THREE.Mesh} object 
      */
     setHighlightedObject(object) {
       // Unhighlight the previously hovered object (if it isn't currently selected)
@@ -182,7 +178,7 @@ export function createScene() {
 
     /**
      * Sets the currently selected object and highlights it
-     * @param {object} object
+     * @param {object} object 
      */
     setActiveObject(object) {
       // Clear highlight on previously active object
@@ -196,10 +192,9 @@ export function createScene() {
      * Resizes the renderer to fit the current game window
      */
     onResize() {
-      cameraManager.camera.aspect =
-        gameWindow.offsetWidth / gameWindow.offsetHeight;
+      cameraManager.camera.aspect = gameWindow.offsetWidth / gameWindow.offsetHeight;
       cameraManager.camera.updateProjectionMatrix();
       renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
-    },
-  };
+    }
+  }
 }

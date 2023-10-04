@@ -1,15 +1,11 @@
-import { createCitizen } from "./citizens.js";
+import { createCitizen } from './citizens.js';
 
 export function createBuilding(buildingType) {
   switch (buildingType) {
-    case "residential":
-      return createResidentialBuilding();
-    case "commercial":
-      return createCommercialBuilding();
-    case "industrial":
-      return createIndustrialBuilding();
-    case "road":
-      return createRoad();
+    case 'residential': return createResidentialBuilding();
+    case 'commercial': return createCommercialBuilding();
+    case 'industrial': return createIndustrialBuilding();
+    case 'road': return createRoad();
     default:
       console.error(`${buildingType} is not a recognized building type.`);
   }
@@ -20,7 +16,7 @@ function createResidentialBuilding() {
     /* PROPERTIES  */
 
     id: crypto.randomUUID(),
-    type: "residential",
+    type: 'residential',
     style: Math.floor(3 * Math.random()) + 1,
     height: 1,
     updated: true,
@@ -34,7 +30,7 @@ function createResidentialBuilding() {
 
     /**
      * Updates the state of this building by one simulation step
-     * @param {object} city
+     * @param {object} city 
      */
     update(city) {
       if (this.residents.length < this.maxResidents) {
@@ -44,14 +40,40 @@ function createResidentialBuilding() {
         console.log(resident);
       }
 
-      if (Math.random() < 0.05) {
+      if (Math.random() < 0.02) {
         if (this.height < 5) {
           this.height += 1;
           this.updated = true;
         }
       }
     },
-  };
+
+    /**
+     * Returns an HTML representation of this object
+     * @returns {string}
+     */
+    toHTML() {
+      let html = '';
+      html += '<br><strong>Building</strong><br>';
+      html += `Type: ${this.type}<br>`;
+      html += `Style: ${this.style}<br>`;
+      html += `Height: ${this.height}<br>`;
+
+      html += `<br><strong>Residents</strong>`;
+
+      html += '<ul style="margin-top: 0; padding-left: 20px;">';
+      if (this.residents.length > 0) {
+        for (const resident of this.residents) {
+          html += `<li>${resident.toHTML()}</li>`;
+        }
+      } else {
+        html += '<li>None</li>'
+      }
+      html += '</ul>';
+
+      return html;
+    }
+  }
 }
 
 function createCommercialBuilding() {
@@ -59,7 +81,7 @@ function createCommercialBuilding() {
     /* PROPERTIES */
 
     id: crypto.randomUUID(),
-    type: "commercial",
+    type: 'commercial',
     style: Math.floor(3 * Math.random()) + 1,
     height: 1,
     updated: true,
@@ -68,17 +90,30 @@ function createCommercialBuilding() {
 
     /**
      * Updates the state of this building by one simulation step
-     * @param {object} city
+     * @param {object} city 
      */
     update(city) {
-      if (Math.random() < 0.05) {
+      if (Math.random() < 0.02) {
         if (this.height < 5) {
           this.height += 1;
           this.updated = true;
         }
       }
     },
-  };
+
+    /**
+     * Returns an HTML representation of this object
+     * @returns {string}
+     */
+    toHTML() {
+      let html = '';
+      html += '<br><strong>Building</strong><br>';
+      html += `Type: ${this.type}<br>`;
+      html += `Style: ${this.style}<br>`;
+      html += `Height: ${this.height}<br>`;
+      return html;
+    }
+  }
 }
 
 function createIndustrialBuilding() {
@@ -86,7 +121,7 @@ function createIndustrialBuilding() {
     /* PROPERTIES */
 
     id: crypto.randomUUID(),
-    type: "industrial",
+    type: 'industrial',
     style: Math.floor(3 * Math.random()) + 1,
     height: 1,
     updated: true,
@@ -95,17 +130,30 @@ function createIndustrialBuilding() {
 
     /**
      * Updates the state of this building by one simulation step
-     * @param {object} city
+     * @param {object} city 
      */
     update(city) {
-      if (Math.random() < 0.05) {
+      if (Math.random() < 0.02) {
         if (this.height < 5) {
           this.height += 1;
           this.updated = true;
         }
       }
     },
-  };
+
+    /**
+     * Returns an HTML representation of this object
+     * @returns {string}
+     */
+    toHTML() {
+      let html = '';
+      html += '<br><strong>Building</strong><br>';
+      html += `Type: ${this.type}<br>`;
+      html += `Style: ${this.style}<br>`;
+      html += `Height: ${this.height}<br>`;
+      return html;
+    }
+  }
 }
 
 function createRoad() {
@@ -113,17 +161,28 @@ function createRoad() {
     /* PROPERTIES */
 
     id: crypto.randomUUID(),
-    type: "road",
+    type: 'road',
     updated: true,
 
     /* METHODS */
 
     /**
      * Updates the state of this building by one simulation step
-     * @param {object} city
+     * @param {object} city 
      */
     update(city) {
       this.updated = false;
     },
-  };
+
+    /**
+     * Returns an HTML representation of this object
+     * @returns {string}
+     */
+    toHTML() {
+      let html = '';
+      html += '<br><strong>Building</strong><br>';
+      html += `Type: ${this.type}<br>`;
+      return html;
+    }
+  }
 }

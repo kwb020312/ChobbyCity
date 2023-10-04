@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chobby City</title>
+    <meta charset="utf-8" />
     <link rel="stylesheet" href="./public/main.css" />
+    <link rel="icon" type="image/x-icon" href="./public/favicon.ico" />
+
+    <!-- Import Three.js library-->
     <script
       async
       src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"
@@ -12,76 +13,89 @@
     <script type="importmap">
       {
         "imports": {
-          "three": "https://unpkg.com/three/build/three.module.js"
+          "three": "https://unpkg.com/three@v0.153.0/build/three.module.js"
         }
       }
     </script>
   </head>
+
   <body>
     <div id="root-window">
+      <!-- Three.js adds a `canvas` element to this element-->
       <div id="render-target">
+        <div id="title-bar">
+          <div id="title-bar-left-items" class="title-bar-items">$1000</div>
+          <div id="title-bar-center-items" class="title-bar-items">My City</div>
+          <div id="title-bar-right-items" class="title-bar-items">
+            Population: <span id="population-counter">0</span>
+          </div>
+        </div>
         <div id="ui-toolbar">
-          <div>
-            <button
-              id="button-select"
-              class="ui-button selected"
-              data-type="select"
-              onclick="window.game.onToolSelected(event)"
-            >
-              선택
-            </button>
-            <button
-              id="button-bulldoze"
-              class="ui-button"
-              onclick="window.game.onToolSelected(event)"
-              data-type="bulldoze"
-            >
-              제거
-            </button>
-            <button
-              id="button-residential"
-              class="ui-button"
-              onclick="window.game.onToolSelected(event)"
-              data-type="residential"
-            >
-              주택
-            </button>
-            <button
-              id="button-commercial"
-              class="ui-button"
-              onclick="window.game.onToolSelected(event)"
-              data-type="commercial"
-            >
-              시장
-            </button>
-            <button
-              id="button-industrial"
-              class="ui-button"
-              onclick="window.game.onToolSelected(event)"
-              data-type="industrial"
-            >
-              회사
-            </button>
-            <button
-              id="button-road"
-              class="ui-button"
-              onclick="window.game.onToolSelected(event)"
-              data-type="road"
-            >
-              도로
-            </button>
-          </div>
-          <div id="info-panel" class="ui-container">
-            <h1>정보</h1>
-            <div id="selected-object-info"></div>
-          </div>
+          <button
+            id="button-select"
+            class="ui-button selected"
+            data-type="select"
+            onclick="game.onToolSelected(event)"
+          >
+            <img class="toolbar-icon" src="public/icons/select.png" />
+          </button>
+          <button
+            id="button-bulldoze"
+            class="ui-button"
+            data-type="bulldoze"
+            onclick="game.onToolSelected(event)"
+          >
+            <img class="toolbar-icon" src="public/icons/bulldozer.png" />
+          </button>
+          <button
+            id="button-residential"
+            class="ui-button"
+            data-type="residential"
+            onclick="game.onToolSelected(event)"
+          >
+            <img class="toolbar-icon" src="public/icons/house.png" />
+          </button>
+          <button
+            id="button-commercial"
+            class="ui-button"
+            data-type="commercial"
+            onclick="game.onToolSelected(event)"
+          >
+            <img class="toolbar-icon" src="public/icons/office.png" />
+          </button>
+          <button
+            id="button-industrial"
+            class="ui-button"
+            data-type="industrial"
+            onclick="game.onToolSelected(event)"
+          >
+            <img class="toolbar-icon" src="public/icons/factory.png" />
+          </button>
+          <button
+            id="button-road"
+            class="ui-button"
+            data-type="road"
+            onclick="game.onToolSelected(event)"
+          >
+            <img class="toolbar-icon" src="public/icons/road.png" />
+          </button>
           <button
             id="button-pause"
             class="ui-button"
-            onclick="window.game.togglePause()"
+            onclick="game.togglePause()"
           >
-            PAUSE
+            <img
+              id="pause-button-icon"
+              class="toolbar-icon"
+              src="public/icons/pause.png"
+            />
           </button>
+        </div>
+        <div id="info-overlay">
+          <div id="info-overlay-header">
+            <span>Tile Info</span>
+          </div>
+          <div id="info-overlay-details"></div>
         </div>
       </div>
     </div>

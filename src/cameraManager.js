@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 export function createCameraManager(gameWindow) {
   // -- Constants --
@@ -21,30 +21,19 @@ export function createCameraManager(gameWindow) {
   const Y_AXIS = new THREE.Vector3(0, 1, 0);
 
   // -- Variables --
-  const camera = new THREE.PerspectiveCamera(
-    45,
-    gameWindow.offsetWidth / gameWindow.offsetHeight,
-    0.1,
-    1000
-  );
+  const camera = new THREE.PerspectiveCamera(45, gameWindow.offsetWidth / gameWindow.offsetHeight, 0.1, 1000);
   let cameraOrigin = new THREE.Vector3(6, 0, 6);
   let cameraRadius = 30;
   let cameraAzimuth = 135;
   let cameraElevation = 45;
 
-  /**
-   * Applies any changes to camera position/orientation
-   */
-  function updateCameraPosition() {
-    camera.position.x =
-      cameraRadius *
-      Math.sin(cameraAzimuth * DEG2RAD) *
-      Math.cos(cameraElevation * DEG2RAD);
+   /**
+     * Applies any changes to camera position/orientation
+     */
+   function updateCameraPosition() {
+    camera.position.x = cameraRadius * Math.sin(cameraAzimuth * DEG2RAD) * Math.cos(cameraElevation * DEG2RAD);
     camera.position.y = cameraRadius * Math.sin(cameraElevation * DEG2RAD);
-    camera.position.z =
-      cameraRadius *
-      Math.cos(cameraAzimuth * DEG2RAD) *
-      Math.cos(cameraElevation * DEG2RAD);
+    camera.position.z = cameraRadius * Math.cos(cameraAzimuth * DEG2RAD) * Math.cos(cameraElevation * DEG2RAD);
     camera.position.add(cameraOrigin);
     camera.lookAt(cameraOrigin);
     camera.updateMatrix();
@@ -64,29 +53,16 @@ export function createCameraManager(gameWindow) {
       // Handles the rotation of the camera
       if (event.buttons & RIGHT_MOUSE_BUTTON) {
         cameraAzimuth += -(event.movementX * AZIMUTH_SENSITIVITY);
-        cameraElevation += event.movementY * ELEVATION_SENSITIVITY;
-        cameraElevation = Math.min(
-          MAX_CAMERA_ELEVATION,
-          Math.max(MIN_CAMERA_ELEVATION, cameraElevation)
-        );
+        cameraElevation += (event.movementY * ELEVATION_SENSITIVITY);
+        cameraElevation = Math.min(MAX_CAMERA_ELEVATION, Math.max(MIN_CAMERA_ELEVATION, cameraElevation));
       }
 
       // Handles the panning of the camera
       if (event.buttons & MIDDLE_MOUSE_BUTTON) {
-        const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(
-          Y_AXIS,
-          cameraAzimuth * DEG2RAD
-        );
-        const left = new THREE.Vector3(1, 0, 0).applyAxisAngle(
-          Y_AXIS,
-          cameraAzimuth * DEG2RAD
-        );
-        cameraOrigin.add(
-          forward.multiplyScalar(PAN_SENSITIVITY * event.movementY)
-        );
-        cameraOrigin.add(
-          left.multiplyScalar(PAN_SENSITIVITY * event.movementX)
-        );
+        const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(Y_AXIS, cameraAzimuth * DEG2RAD);
+        const left = new THREE.Vector3(1, 0, 0).applyAxisAngle(Y_AXIS, cameraAzimuth * DEG2RAD);
+        cameraOrigin.add(forward.multiplyScalar(PAN_SENSITIVITY * event.movementY));
+        cameraOrigin.add(left.multiplyScalar(PAN_SENSITIVITY * event.movementX));
       }
 
       updateCameraPosition();
@@ -98,12 +74,9 @@ export function createCameraManager(gameWindow) {
      */
     onMouseScroll(event) {
       cameraRadius += event.deltaY * ZOOM_SENSITIVITY;
-      cameraRadius = Math.min(
-        MAX_CAMERA_RADIUS,
-        Math.max(MIN_CAMERA_RADIUS, cameraRadius)
-      );
+      cameraRadius = Math.min(MAX_CAMERA_RADIUS, Math.max(MIN_CAMERA_RADIUS, cameraRadius));
 
       updateCameraPosition();
-    },
-  };
+    }
+  }
 }

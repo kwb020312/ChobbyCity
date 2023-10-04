@@ -1,6 +1,6 @@
-import { createScene } from "./scene.js";
-import { createCity } from "./city.js";
-import { createBuilding } from "./buildings.js";
+import { createScene } from './scene.js';
+import { createCity } from './city.js';
+import { createBuilding } from './buildings.js';
 
 // Create a new game when the window is loaded
 window.onload = () => {
@@ -9,17 +9,17 @@ window.onload = () => {
   // Start update interval
   setInterval(() => {
     window.game.update();
-  }, 1000);
-};
+  }, 1000)
+}
 
 /**
  * Creates a new Game object
  * @returns a Game object
  */
 export function createGame() {
-  let selectedControl = document.getElementById("button-select");
-  let activeToolId = "select";
-  let isPaused = false;
+  let selectedControl = document.getElementById('button-select');
+  let activeToolId = 'select';
+  let isPaused = false;  
   // Last time mouse was moved
   let lastMove = new Date();
 
@@ -29,21 +29,17 @@ export function createGame() {
   scene.initialize(city);
 
   // Hookup event listeners
-  document.addEventListener("wheel", scene.cameraManager.onMouseScroll, false);
-  document.addEventListener("mousedown", onMouseDown, false);
-  document.addEventListener("mousemove", onMouseMove, false);
-  window.addEventListener("resize", scene.onResize, false);
+  document.addEventListener('wheel', scene.cameraManager.onMouseScroll, false);
+  document.addEventListener('mousedown', onMouseDown, false);
+  document.addEventListener('mousemove', onMouseMove, false);
+  window.addEventListener('resize', scene.onResize, false);
 
   // Prevent context menu from popping up
-  document.addEventListener(
-    "contextmenu",
-    (event) => event.preventDefault(),
-    false
-  );
+  document.addEventListener('contextmenu', (event) => event.preventDefault(), false);
 
   /**
    * Event handler for `mousedown` event
-   * @param {MouseEvent} event
+   * @param {MouseEvent} event 
    */
   function onMouseDown(event) {
     // Check if left mouse button pressed
@@ -51,15 +47,15 @@ export function createGame() {
       const selectedObject = scene.getSelectedObject(event);
       useActiveTool(selectedObject);
     }
-  }
+  };
 
   /**
    * Event handler for 'mousemove' event
-   * @param {MouseEvent} event
+   * @param {MouseEvent} event 
    */
   function onMouseMove(event) {
     // Throttle event handler so it doesn't kill the browser
-    if (Date.now() - lastMove < 1 / 60.0) return;
+    if (Date.now() - lastMove < (1 / 60.0)) return;
     lastMove = Date.now();
 
     // Get the object the mouse is currently hovering over
@@ -77,7 +73,7 @@ export function createGame() {
 
   function useActiveTool(object) {
     if (!object) {
-      updateInfoPanel(null);
+      updateInfoOverlay(null);
       return;
     }
 
@@ -85,10 +81,10 @@ export function createGame() {
     const tile = city.tiles[x][y];
 
     // If bulldoze is active, delete the building
-    if (activeToolId === "select") {
+    if (activeToolId === 'select') {
       scene.setActiveObject(object);
-      updateInfoPanel(tile);
-    } else if (activeToolId === "bulldoze") {
+      updateInfoOverlay(tile);
+    } else if (activeToolId === 'bulldoze') {
       tile.removeBuilding();
       scene.update(city);
       // Otherwise, place the building if this tile doesn't have one
@@ -99,10 +95,12 @@ export function createGame() {
     }
   }
 
-  function updateInfoPanel(tile) {
-    document.getElementById("selected-object-info").innerHTML = tile
-      ? JSON.stringify(tile, " ", 2)
-      : "";
+  function updateInfoOverlay(tile) {
+    document.getElementById('info-overlay-details').innerHTML = tile ? tile.toHTML() : '';
+  }
+
+  function updateTitleBar() {
+    document.getElementById('population-counter').innerHTML = city.getPopulation();
   }
 
   // Start the renderer
@@ -120,32 +118,36 @@ export function createGame() {
       city.update();
       scene.update(city);
 
-      // updateTitleBar();
+      updateTitleBar();
     },
 
     /**
-     *
-     * @param {*} event
+     * 
+     * @param {*} event 
      */
     onToolSelected(event) {
       // Deselect previously selected button and selected this one
       if (selectedControl) {
-        selectedControl.classList.remove("selected");
+        selectedControl.classList.remove('selected');
       }
       selectedControl = event.target;
-      selectedControl.classList.add("selected");
+      selectedControl.classList.add('selected');
 
-      activeToolId = selectedControl.getAttribute("data-type");
+      activeToolId = selectedControl.getAttribute('data-type');
       console.log(activeToolId);
     },
-
+    
     /**
      * Toggles the pause state of the game
      */
     togglePause() {
-      document.getElementById("button-pause").innerHTML = isPaused
-        ? "RESUME"
-        : "PAUSE";
-    },
+      isPaused = !isPaused;
+      console.log(`Is Paused: ${isPaused}`);
+      if (isPaused) {
+        document.getElementById('pause-button-icon').src = 'public/icons/play.png';
+      } else {
+        document.getElementById('pause-button-icon').src = 'public/icons/pause.png';
+      }
+    }
   };
 }
